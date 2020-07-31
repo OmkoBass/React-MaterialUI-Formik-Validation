@@ -1,14 +1,24 @@
 import React from 'react';
 
-import {Button, Grid, Container, Fab, TextField, CircularProgress} from "@material-ui/core";
+import {Button, Grid, Container, Fab, TextField, Checkbox, FormControlLabel, FormHelperText, CircularProgress} from "@material-ui/core";
 
 import AddIcon from "@material-ui/icons/Add";
 
-import {Form, Field, Formik} from "formik";
+import {Form, Field, Formik, useField} from "formik";
 
 import * as Yup from "yup";
 
 import './Styles/Global.css';
+
+const CheckBoxControlLabel = (props) => {
+    const [field] = useField({
+       name: props.name,
+       type: 'checkbox',
+       value: props.value
+    });
+
+    return <FormControlLabel control={<Checkbox {...props} {...field}/>} label={props.label}/>
+}
 
 function App() {
     return <Container maxWidth='md'>
@@ -17,6 +27,7 @@ function App() {
                 name: '',
                 lastName: '',
                 message: '',
+                agree: false
             }}
             validationSchema={Yup.object({
                 name: Yup.string()
@@ -27,7 +38,8 @@ function App() {
                     .min(3, 'Must be at least 3 characters!')
                     .max(32, 'Must be 32 characters or less!')
                     .required('Required!'),
-                message: Yup.string().min(12, `That's not a proper message now is it ?`).required('Required!')
+                message: Yup.string().min(12, `That's not a proper message now is it ?`).required('Required!'),
+                agree: Yup.boolean().oneOf([true], 'You must agree to the terms!')
             })}
             onSubmit={(values, {setSubmitting, resetForm}) => {
                 setSubmitting(true);
@@ -79,6 +91,20 @@ function App() {
                                 error={touched.message && !!errors.message}
                                 helperText={touched.message && errors.message ? errors.message : null}
                             />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <CheckBoxControlLabel
+                                name='agree'
+                                label='I agree to the terms'
+                            />
+                            {
+                                touched.agree && !!errors.agree
+                                    ?
+                                    <FormHelperText>{errors.agree}</FormHelperText>
+                                    :
+                                    null
+                            }
                         </Grid>
 
                         <Grid item xs={12}>
